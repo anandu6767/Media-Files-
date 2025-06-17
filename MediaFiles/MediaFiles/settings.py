@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'media_app',
+    'django_celery_beat',
 ]
 
 MIDDLEWARE = [
@@ -131,3 +132,18 @@ TEMPLATES[0]['DIRS'] = [os.path.join(BASE_DIR, 'templates')]
 
 LOGIN_URL = 'login'
 LOGIN_REDIRECT_URL = 'upload'
+
+# CELERY SETTINGS
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+
+
+from celery.schedules import crontab
+
+CELERY_BEAT_SCHEDULE = {
+    'log-every-5-minutes': {
+        'task': 'media_app.tasks.log_to_file',
+        'schedule': crontab(minute='*/5'),
+    },
+}
